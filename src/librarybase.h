@@ -18,10 +18,10 @@
 
 
 #define VERSION  1
-#define REVISION 8
+#define REVISION 9
 
 #define EXLIBNAME "c2p.library"
-#define EXLIBVER  " 1.8 (09.09.2025)"
+#define EXLIBVER  " 1.9 (22.12.2025)"
 #define EXLIBCOPY "(C)opyright 2022-2025, Alimede Informatica. All rights reserved."
 
 

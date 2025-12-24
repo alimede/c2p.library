@@ -1,6 +1,6 @@
-; Convert 8 bit chunky to 2 bitplanes planar
+; optimized version for CPU with bigger instruction cache (040+)
 
-	MACHINE	68020
+	MACHINE	68040
 
 
 
@@ -24,35 +24,30 @@ push  MACRO reg
 
 
 
-; c2p_8x1_addx
-; Chunky 2 Planar conversion, 1 bit per pixel.
+; c2p_8x1_addx_040
+; Chunky 2 Planar conversion, 1 bit per pixel, optimized for 040+.
 ; a0 = chunky buffer
 ; a1 = raster address
 ; d0 = num pixels to convert
 ; d1 = bitplane size
-	public	_c2p_8x1_addx
+	public	_c2p_8x1_addx_040
 	cnop	0,4
-_c2p_8x1_addx:
-	movem.l	d2-d7/a3-a4,-(sp)
+_c2p_8x1_addx_040:
+	movem.l	d6-d7,-(sp)
 
 	move.l	d0,d6
 	lsr.l	#5,d6		; 32 pixels per loop
 
-	dbra.w	d6,.c2p_loop
+	dbra.w	d6,.c2p_prefetch
 	nop
 
 	cnop	0,64
-.c2p_loop:
-	movem.l	(a0)+,d0-d5/a3-a4
-		; D0 = 0, 1, 2, 3
-		; D1 = 4, 5, 6, 7
-		; D2 = 8, 9, 10, 11
-		; D3 = 12, 13, 14, 15
-		; D4 = 16, 17, 18, 19
-		; D5 = 20, 21, 22, 23
-		; A3 = 24, 25, 26, 27
-		; A4 = 28, 29, 30, 31
+.c2p_prefetch:
+	; Interleaved MOVE + processing (faster than MOVEM on 68040+)
+	move.l	(a0)+,d0	; D0 = 0, 1, 2, 3
 
+.c2p_loop:
+	move.l	(a0)+,d1	; D1 = 4, 5, 6, 7 (interleaved)
 		; D7 will contains bpl0
 
 	lsl.l	#8,d0		; bit 0
@@ -65,6 +60,8 @@ _c2p_8x1_addx:
 	addx.l	d7,d7
 		; D0 = free to use
 
+	move.l	(a0)+,d0	; D0 = 8, 9, 10, 11 (interleaved)
+
 	lsl.l	#8,d1		; bit 4
 	addx.l	d7,d7
 	lsl.l	#8,d1		; bit 5
@@ -75,51 +72,55 @@ _c2p_8x1_addx:
 	addx.l	d7,d7
 		; D1 = free to use
 
-	lsl.l	#8,d2		; bit 8
-	addx.l	d7,d7
-	lsl.l	#8,d2		; bit 9
-	addx.l	d7,d7
-	lsl.l	#8,d2		; bit 10
-	addx.l	d7,d7
-	lsl.l	#8,d2		; bit 11
-	addx.l	d7,d7
-		; D2 = free to use
+	move.l	(a0)+,d1	; D1 = 12, 13, 14, 15 (interleaved)
 
-	move.l	a3,d0		; moved here to optimize superscalar pipeline
-		; D0 = 24, 25, 26, 27
+	lsl.l	#8,d0		; bit 8
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 9
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 10
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 11
+	addx.l	d7,d7
+		; D0 = free to use
 
-	lsl.l	#8,d3		; bit 12
-	addx.l	d7,d7
-	lsl.l	#8,d3		; bit 13
-	addx.l	d7,d7
-	lsl.l	#8,d3		; bit 14
-	addx.l	d7,d7
-	lsl.l	#8,d3		; bit 15
-	addx.l	d7,d7
-		; D3 = free to use
+	move.l	(a0)+,d0	; D0 = 16, 17, 18, 19 (interleaved)
 
-	lsl.l	#8,d4		; bit 16
+	lsl.l	#8,d1		; bit 12
 	addx.l	d7,d7
-	lsl.l	#8,d4		; bit 17
+	lsl.l	#8,d1		; bit 13
 	addx.l	d7,d7
-	lsl.l	#8,d4		; bit 18
+	lsl.l	#8,d1		; bit 14
 	addx.l	d7,d7
-	lsl.l	#8,d4		; bit 19
+	lsl.l	#8,d1		; bit 15
 	addx.l	d7,d7
-		; D4 = free to use
+		; D1 = free to use
 
-	lsl.l	#8,d5		; bit 20
-	addx.l	d7,d7
-	lsl.l	#8,d5		; bit 21
-	addx.l	d7,d7
-	lsl.l	#8,d5		; bit 22
-	addx.l	d7,d7
-	lsl.l	#8,d5		; bit 23
-	addx.l	d7,d7
-		; D5 = free to use
+	move.l	(a0)+,d1	; D1 = 20, 21, 22, 23 (interleaved)
 
-	move.l	a4,d1		; moved here to optimize superscalar pipeline
-		; D1 = 28, 29, 30, 31
+	lsl.l	#8,d0		; bit 16
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 17
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 18
+	addx.l	d7,d7
+	lsl.l	#8,d0		; bit 19
+	addx.l	d7,d7
+		; D0 = free to use
+
+	move.l	(a0)+,d0	; D0 = 24, 25, 26, 27 (interleaved)
+
+	lsl.l	#8,d1		; bit 20
+	addx.l	d7,d7
+	lsl.l	#8,d1		; bit 21
+	addx.l	d7,d7
+	lsl.l	#8,d1		; bit 22
+	addx.l	d7,d7
+	lsl.l	#8,d1		; bit 23
+	addx.l	d7,d7
+		; D1 = free to use
+
+	move.l	(a0)+,d1	; D1 = 28, 29, 30, 31 (interleaved)
 
 	lsl.l	#8,d0		; bit 24
 	addx.l	d7,d7
@@ -130,6 +131,8 @@ _c2p_8x1_addx:
 	lsl.l	#8,d0		; bit 27
 	addx.l	d7,d7
 		; D0 = free to use
+
+	move.l	(a0)+,d0	; D0 = 0, 1, 2, 3 (interleaved, next round)
 
 	lsl.l	#8,d1		; bit 28
 	addx.l	d7,d7
@@ -151,7 +154,7 @@ _c2p_8x1_addx:
 ;	lea		.c2p_loop,a0
 ;	lea		.c2p_loop_end,a1
 ;	move.l	a1,d0
-;	sub.l	a0,d0	; 0x8e = 142 bytes
+;	sub.l	a0,d0	; 0x96 = 150 bytes
 ;	nop
 
 			;------;
@@ -160,7 +163,7 @@ _c2p_8x1_addx:
 
 .c2p_exit:
 
-	movem.l	(sp)+,d2-d7/a3-a4
+	movem.l	(sp)+,d6-d7
 	rts
   
 	end

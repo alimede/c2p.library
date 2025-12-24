@@ -8,11 +8,11 @@ Amiga classic bitplane hardware.
 The library operates in a very low-level environment, don't expect to find
 any hardware abstraction layer.
 
-The library operate using the black-box concept, like in a object-oriented
+The library operates using the black-box concept, like in an object-oriented
 programming framework. All iterations are performed using system calls,
 avoiding the use of public data structures.
 
-The core object is the Context, wich is used to perform all chunky2planar
+The core object is the Context, which is used to perform all chunky2planar
 operations.
 
 
@@ -27,7 +27,7 @@ operations.
 THE CONTEXT LIFETIME
 --------------------
 
-Normal operations consists in the following steps:
+Normal operations consist in the following steps:
 
 1) Create a Context using C2P_CreateContext function:
    (pseudo language C-like)
@@ -68,7 +68,7 @@ Normal operations consists in the following steps:
 	}
 
 
-4) Gets the Context Chunky buffer and BitMap:
+4) Get the Context Chunky buffer and BitMap:
    (pseudo language C-like)
 
 	APTR bitmap = C2P_GetContextParameter(
@@ -114,7 +114,7 @@ Normal operations consists in the following steps:
 	C2P_Chunky2Planar(ctx);
 
 
-9) Repeat step 6 until game ends.
+9) Repeat from step 6 until game ends.
 
 
 10) Before exit, destroy the Context:
@@ -144,14 +144,14 @@ SPEED UP TO THE LIMITS
 ----------------------
 
 If you can change the programming approach from horizontal to vertical
-rasterization, you can got a big speed improvement using the Scrambled buffer
-instead the classic Chunky buffer.
+rasterization, you can get a big speed improvement using the Scrambled buffer
+instead of the classic Chunky buffer.
 
-This mode can be used easily in a FPS games (Doom like).
+This mode can be used easily in FPS games (Doom like).
 
 The scrambled buffer is a chunky buffer with a different column order.
 Substantially, when you draw a pixel in the scrambled buffer, you are
-directly making the firsts passes of the chunky2planar conversion algorythm.
+directly making the first passes of the chunky2planar conversion algorithm.
 So, the c2p conversion can be reduced in complexity, gaining speed.
 
 In a classic chunky buffer, the order of pixels is:
@@ -179,7 +179,7 @@ You need to force the scrambled chunky mode for a Context:
 	... some other context parameters sets ...
 	C2P_InitializeContext(context);
 
-Firsts, call the C2P_GetContextParameter() function to read the number of
+First, call the C2P_GetContextParameter() function to read the number of
 scrambled offsets, querying for the appropriate parameter:
 (pseudo language C-like)
 
@@ -202,11 +202,12 @@ Next, call the C2P_GetContextIndexedParameter() function to fetch the n-th
 scrambled offset:
 (pseudo language C-like)
 
-	for (int i = 1; i < N ; i++)
+	for (int i = 0; i < N ; i++)
 	{
 		offsets[i] = C2P_GetContextIndexedParameter(
 			context,
-			C2P_CONTEXT_PARAMETER_SCRAMBLED_OFFSETS_COUNT
+			C2P_CONTEXT_PARAMETER_SCRAMBLED_OFFSET,
+			i
 			);
 	}
 
@@ -218,7 +219,7 @@ Eventually, add the offset to the X-coord of the pixel:
 
 Note: the number N of scrambled offsets is guaranteed to be a power of 2.
 You can calculate the modulo simply using a bitwise AND operation with N-1.
-As example, the last sample instruction become:
+As an example, the last written instruction becomes:
 (pseudo language C-like)
 
 	int x_scrambled = x_pixel + offsets[x_pixel & (N - 1)];
@@ -276,8 +277,8 @@ bitmap (same width), you can specify:
 
 and next draw some Blitter Objects over the bitmap.
 
-BE WARN: Pay attention of the source and destination size, no controls are
-performed and if you exceed the bounds the system may crash.
+BE WARNED: Pay attention to the source and destination size, no controls
+are performed and if you exceed the bounds the system may crash.
 
 
 
@@ -348,8 +349,8 @@ DELTA CONVERSION
 ----------------
 
 In some cases, only few pixels will change between two different frames.
-The best approach may be convert only the modified pixels presents in new
-frame, keeping all the others.
+The best approach may be to convert only the modified pixels present in
+the new frame, keeping all the others.
 In order to achieve this, you must provide the old frame into a reference
 buffer, so that the new frame can use it to compare and find the modified
 pixels.
@@ -377,6 +378,6 @@ perform a comparison for each group of pixels. It is faster if a maximum of
 60-70% of the pixels are modified. Otherwise it is better to use the classic
 conversion.
 
-BE WARN: Pay attention of the reference buffer size, it must be equal to the
-chunky buffer size.
+BE WARNED: Pay attention to the reference buffer size, it must be equal to
+the chunky buffer size.
 

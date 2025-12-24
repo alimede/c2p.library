@@ -160,8 +160,8 @@ ULONG _C2P_Chunky2Planar(__reg("a0") APTR context, __reg("a6") struct LibraryBas
                     {
                         if (library_base->lb_AkikoDetected && (library_base->lb_Cpu <= C2P_SYSTEM_CPU_68020))
                             c2p_akiko_8x1(chunky_ptr, raster_ptr, num_pixels, bpl_size, library_base->lb_GfxBase);
-                        //else if (library_base->lb_Cpu <= C2P_SYSTEM_CPU_68030)
-                        //    c2p_8x1(chunky_ptr, raster_ptr, scrambled_ptr, num_pixels, bpl_size);
+                        else if (library_base->lb_Cpu <= C2P_SYSTEM_CPU_68030)
+                            c2p_8x1(chunky_ptr, raster_ptr, scrambled_ptr, num_pixels, bpl_size);
                         else
                             c2p_8x1_040(chunky_ptr, raster_ptr, num_pixels, bpl_size);
                     }

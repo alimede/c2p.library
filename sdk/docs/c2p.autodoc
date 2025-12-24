@@ -44,7 +44,7 @@ c2p.library/C2P_WritePixel
 
     NOTES
         The allocated memory is guaranteed to be CLEAR (each byte set to 0).
-        Use the C2P_FreeMem to deallocate the memoty block, DON'T use other
+        Use the C2P_FreeMem to deallocate the memory block, DON'T use other
         Amiga system functions.
         This function aids to minimize memory leaks: if you don't free the
         memory using a C2P_FreeMem() call, the memory will still become free
@@ -60,14 +60,14 @@ c2p.library/C2P_WritePixel
 c2p.library/C2P_Chunky2Planar
 
     NAME
-        C2P_Chunky2Planar - perform the c2p conversion..
+        C2P_Chunky2Planar - perform the c2p conversion.
 
     SYNOPSIS
-        result = C2_Chunky2Planar(context)
-        d0                        a0
+        result = C2P_Chunky2Planar(context)
+        d0                         a0
 
     FUNCTION
-        This function esecutes the chunky to planar conversion.
+        This function executes the chunky to planar conversion.
 
     INPUTS
         context     - context describing the chunky to planar data
@@ -95,7 +95,7 @@ c2p.library/C2P_WritePixel
                     a0   a1    d0
 
     FUNCTION
-        This function copy a memory block.
+        This function copies a memory block.
 
     INPUTS
         src         - address of source memory block
@@ -137,9 +137,9 @@ c2p.library/C2P_WritePixel
         bitmap      - address of the bitmap or NULL if error.
 
     NOTES
-        This is an helper function.
+        This is a helper function.
         You must manually deallocate the external custom Bitmap you provide
-        to the Context. Call C2P_DestroyBitmap to deallocate a BitMap created
+        to the Context. Call C2P_DestroyBitMap to deallocate a BitMap created
         using this function.
 
     SEE ALSO
@@ -166,7 +166,7 @@ c2p.library/C2P_WritePixel
         context     - address of the context or NULL if error.
 
     NOTES
-        After creation, you can specify the context parameyters.
+        After creation, you can specify the context parameters.
         In order to use the context, the context must be initialized.
 
     SEE ALSO
@@ -207,14 +207,14 @@ c2p.library/C2P_WritePixel
 
 
 
-c2p.library/C2P_DestroyContex
+c2p.library/C2P_DestroyContext
 
     NAME
         C2P_DestroyContext - destroy a previously created context.
     
     SYNOPSIS
-        C2P_DestroyContex(context) 
-                          a0
+        C2P_DestroyContext(context) 
+                           a0
 
     FUNCTION
         This function destroys a previously created context.
@@ -224,7 +224,7 @@ c2p.library/C2P_WritePixel
         context      - address of the context
 
     NOTES
-        After descruction, che context cannot be used anymore.
+        After destruction, the context cannot be used anymore.
 
     SEE ALSO
         C2P_CreateContext(), C2P_InitializeContext()
@@ -248,7 +248,7 @@ c2p.library/C2P_WritePixel
         If input parameter is NULL, this function does nothing.
 
     INPUTS
-        memptr      - address of memoty block to deallocate.
+        memptr      - address of memory block to deallocate.
 
     NOTES
         The memory block must be previously allocated using C2P_AllocMem().
@@ -291,8 +291,8 @@ c2p.library/C2P_WritePixel
                 n-th value directly to scrambled mode chunky buffer.
 
     SEE ALSO
-        C2_GetContextParameter(), C2P_SetContextIndexedParameter(),
-        C2_SetContextParameter()
+        C2P_GetContextParameter(), C2P_SetContextIndexedParameter(),
+        C2P_SetContextParameter()
 
 
 
@@ -390,8 +390,8 @@ c2p.library/C2P_WritePixel
                 Width in pixel of the area to convert.
 
     SEE ALSO
-        C2_SetContextParameter(), C2P_SetContextIndexedParameter()
-        C2_GetContextIndexedParameter()
+        C2P_SetContextParameter(), C2P_SetContextIndexedParameter()
+        C2P_GetContextIndexedParameter()
 
 
 
@@ -426,7 +426,7 @@ c2p.library/C2P_WritePixel
         As of now, a NULL value is always returned.
 
     SEE ALSO
-        C2_GetSystemParameter()
+        C2P_GetSystemParameter()
 
 
 
@@ -453,7 +453,7 @@ c2p.library/C2P_WritePixel
 
     PARAMETERS
         C2P_SYSTEM_PARAMETER_AKIKO_C2P_PTR (APTR)
-                If the Akiko chip is detected, this value will returns the
+                If the Akiko chip is detected, this value will return the
                 address used by the chunky to planar hardware conversion.
 
         C2P_SYSTEM_PARAMETER_AKIKO_DETECTED (BOOL)
@@ -479,7 +479,7 @@ c2p.library/C2P_WritePixel
                 Current version number of the library.
 
     SEE ALSO
-        C2_GetSystemIndexedParameter()
+        C2P_GetSystemIndexedParameter()
 
 
 
@@ -498,12 +498,12 @@ c2p.library/C2P_WritePixel
         This function initializes a previously created context.
         Returns NULL on success, or the error code.
         
-        You must initialize a context in order to us it for the chunky
+        You must initialize a context in order to use it for the chunky
         to planar conversion.
 
         Prior to initialize the context, you MUST set the appropriate
         parameters. Once a context has been initialized, you can set
-        only few parameters, but you can ever get all values of the other
+        only few parameters, but you can still get all values of the other
         parameters.
         
     INPUTS
@@ -549,8 +549,8 @@ c2p.library/C2P_WritePixel
         No writeable indexed parameters presents by now.
 
     SEE ALSO
-        C2_SetContextParameter(), C2P_GetContextIndexedParameter(),
-        C2_GetContextParameter()
+        C2P_SetContextParameter(), C2P_GetContextIndexedParameter(),
+        C2P_GetContextParameter()
 
 
 
@@ -592,7 +592,7 @@ c2p.library/C2P_WritePixel
 
         C2P_CONTEXT_PARAMETER_CONVERT_COUNT (LONG)
                 Number of pixels to process during the c2p conversion.
-                Must between 0 and WIDTH * HEIGHT, and be a multiple of
+                Must be between 0 and WIDTH * HEIGHT, and be a multiple of
                 C2P_CONTEXT_PARAMETER_SCRAMBLED_OFFSETS_COUNT.
                 Default value is WIDTH * HEIGHT.
                 Note: pay attention to the max size of any external custom
@@ -668,8 +668,8 @@ c2p.library/C2P_WritePixel
                 C2P_CONTEXT_PARAMETER_SCRAMBLED_OFFSETS_COUNT.
 
     SEE ALSO
-        C2_GetContextParameter(), C2P_GetContextIndexedParameter()
-        C2_SetContextIndexedParameter()
+        C2P_GetContextParameter(), C2P_GetContextIndexedParameter()
+        C2P_SetContextIndexedParameter()
 
 
 

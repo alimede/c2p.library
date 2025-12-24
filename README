@@ -2,7 +2,7 @@ Short:        chunky2planar as an Amiga shared library
 Author:       Alimede Informatica
 Uploader:     Gabriele Budelacci <g.bude@alimede.com>
 Type:         dev/misc
-Version:      1.8
+Version:      1.9
 Requires:     68020+
 Architecture: m68k-amigaos >= 1.2
 
@@ -49,9 +49,12 @@ requirements
 recent changes
 -----------------------------
 
+v1.9
+    - avoids pipeline stalls in the conversion on the 68040/060 CPUs.
+
 v1.8
     - custom memory manager, which ensures backward compatibility of
-      the code back to AmigaOS 1.2 (still requires a 68020+ CPU)
+      the code back to AmigaOS 1.2 (still requires a 68020+ CPU).
 
 v1.7
     - improved conversion speed (up to +20%) for 1, 2 and 3 bitplanes.

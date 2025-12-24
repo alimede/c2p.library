@@ -53,7 +53,7 @@ _c2p_8x1:
 	public	_c2p_8x1_040
 	cnop	0,4
 _c2p_8x1_040:
-	bra.w	_c2p_8x1_addx
+	bra.w	_c2p_8x1_addx_040
 
 
 

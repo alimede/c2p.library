@@ -101,21 +101,24 @@ _c2p_8x8_mexg_040_core:
 	cnop	0,64
 .c2p_loop:
 	move.w	d7,a4		; loop counter in a4
-	movem.l	(a0)+,d0-d7
-		; D0 = 0, 1, 2, 3
-		; D1 = 4, 5, 6, 7
-		; D2 = 8, 9, 10, 11
-		; D3 = 12, 13, 14, 15
-		; D4 = 16, 17, 18, 19
-		; D5 = 20, 21, 22, 23
-		; D6 = 24, 25, 26, 27
-		; D7 = 28, 29, 30, 31
-	ror.l	#8,d2
-	ror.l	#8,d3
-	swap	d4
-	swap	d5
-	rol.l	#8,d6
-	rol.l	#8,d7
+
+	; Interleaved MOVE + ROL/ROR/SWAP (faster than MOVEM on 68040+)
+	move.l	(a0)+,d0	; D0 = 0, 1, 2, 3
+	move.l	(a0)+,d1	; D1 = 4, 5, 6, 7
+	move.w	d0,a6		; preloaded for swap words later
+	move.l	(a0)+,d2	; D2 = 8, 9, 10, 11
+	move.w	d1,a5		; preloaded for swap words later
+	move.l	(a0)+,d3	; D3 = 12, 13, 14, 15
+	ror.l	#8,d2		; D2 = 11, 8, 9, 10
+	move.l	(a0)+,d4	; D4 = 16, 17, 18, 19
+	ror.l	#8,d3		; D3 = 15, 12, 13, 14
+	move.l	(a0)+,d5	; D5 = 20, 21, 22, 23
+	swap	d4			; D4 = 18, 19, 16, 17
+	move.l	(a0)+,d6	; D6 = 24, 25, 26, 27
+	swap	d5			; D5 = 22, 23, 20, 21
+	move.l	(a0)+,d7	; D7 = 28, 29, 30, 31
+	rol.l	#8,d6		; D6 = 25, 26, 27, 24
+	rol.l	#8,d7		; D7 = 29, 30, 31, 28
 		; D0 = 0, 1, 2, 3
 		; D1 = 4, 5, 6, 7
 		; D2 = 11, 8, 9, 10
@@ -125,8 +128,8 @@ _c2p_8x8_mexg_040_core:
 		; D6 = 25, 26, 27, 24
 		; D7 = 29, 30, 31, 28
 
-	move.w	d0,a6
-	move.w	d1,a5
+		; A5 = ?, ?, 6, 7
+		; A6 = ?, ?, 2, 3
 	move.w	d4,d0	; D0 = 0, 1, 16, 17
 	move.w	d5,d1	; D1 = 4, 5, 20, 21
 	move.w	a6,d4	; D4 = 18, 19, 2, 3
@@ -480,7 +483,7 @@ mask_nibbles_4	equ	$87878787
 ;	lea		.c2p_loop,a0
 ;	lea		.c2p_loop_end,a1
 ;	move.l	a1,d0
-;	sub.l	a0,d0	; 0x192 = 402 bytes
+;	sub.l	a0,d0	; 0x19e = 414 bytes
 ;	nop
 
 			;------;

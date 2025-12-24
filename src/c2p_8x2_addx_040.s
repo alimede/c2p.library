@@ -70,21 +70,16 @@ _c2p_8x2_addx_040_core:
 	move.l	d0,d7
 	lsr.l	#5,d7		; 32 pixels per loop
 
-	dbra.w	d7,.c2p_loop
+	dbra.w	d7,.c2p_prefetch
 	nop
 
 	cnop	0,64
-.c2p_loop:
-	movem.l	(a0)+,d0-d4/a3-a5
-		; D0 = 0, 1, 2, 3
-		; D1 = 4, 5, 6, 7
-		; D2 = 8, 9, 10, 11
-		; D3 = 12, 13, 14, 15
-		; D4 = 16, 17, 18, 19
-		; A3 = 20, 21, 22, 23
-		; A4 = 24, 25, 26, 27
-		; A5 = 28, 29, 30, 31
+.c2p_prefetch:
+	; Interleaved MOVE + processing (faster than MOVEM on 68040+)
+	move.l	(a0)+,d0	; D0 = 0, 1, 2, 3
 
+.c2p_loop:
+	move.l	(a0)+,d1	; D1 = 4, 5, 6, 7 (interleaved)
 		; D5 will contains bpl0
 		; D6 will contains bpl1
 
@@ -106,6 +101,8 @@ _c2p_8x2_addx_040_core:
 	addx.l	d5,d5
 		; D0 = free to use
 
+	move.l	(a0)+,d0	; D0 = 8, 9, 10, 11 (interleaved)
+
 	lsl.l	#7,d1		; bit 4
 	addx.l	d6,d6
 	add.l	d1,d1		; bit 4
@@ -124,124 +121,127 @@ _c2p_8x2_addx_040_core:
 	addx.l	d5,d5
 		; D1 = free to use
 
-	move.l	a3,d0		; moved here to optimize superscalar pipeline
-		; D0 = 20, 21, 22, 23
+	move.l	(a0)+,d1	; D1 = 12, 13, 14, 15 (interleaved)
 
-	lsl.l	#7,d2		; bit 8
+	lsl.l	#7,d0		; bit 8
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 8
+	add.l	d0,d0		; bit 8
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 9
+	lsl.l	#7,d0		; bit 9
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 9
+	add.l	d0,d0		; bit 9
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 10
+	lsl.l	#7,d0		; bit 10
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 10
+	add.l	d0,d0		; bit 10
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 11
+	lsl.l	#7,d0		; bit 11
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 11
-	addx.l	d5,d5
-		; D2 = free to use
-
-	lsl.l	#7,d3		; bit 12
-	addx.l	d6,d6
-	add.l	d3,d3		; bit 12
-	addx.l	d5,d5
-	lsl.l	#7,d3		; bit 13
-	addx.l	d6,d6
-	add.l	d3,d3		; bit 13
-	addx.l	d5,d5
-	lsl.l	#7,d3		; bit 14
-	addx.l	d6,d6
-	add.l	d3,d3		; bit 14
-	addx.l	d5,d5
-	lsl.l	#7,d3		; bit 15
-	addx.l	d6,d6
-	add.l	d3,d3		; bit 15
-	addx.l	d5,d5
-		; D3 = free to use
-
-	move.l	a4,d1		; moved here to optimize superscalar pipeline
-		; D1 = 24, 25, 26, 27
-
-	lsl.l	#7,d4		; bit 16
-	addx.l	d6,d6
-	add.l	d4,d4		; bit 16
-	addx.l	d5,d5
-	lsl.l	#7,d4		; bit 17
-	addx.l	d6,d6
-	add.l	d4,d4		; bit 17
-	addx.l	d5,d5
-	lsl.l	#7,d4		; bit 18
-	addx.l	d6,d6
-	add.l	d4,d4		; bit 18
-	addx.l	d5,d5
-	lsl.l	#7,d4		; bit 19
-	addx.l	d6,d6
-	add.l	d4,d4		; bit 19
-	addx.l	d5,d5
-		; D4 = free to use
-
-	lsl.l	#7,d0		; bit 20
-	addx.l	d6,d6
-	add.l	d0,d0		; bit 20
-	addx.l	d5,d5
-	lsl.l	#7,d0		; bit 21
-	addx.l	d6,d6
-	add.l	d0,d0		; bit 21
-	addx.l	d5,d5
-	lsl.l	#7,d0		; bit 22
-	addx.l	d6,d6
-	add.l	d0,d0		; bit 22
-	addx.l	d5,d5
-	lsl.l	#7,d0		; bit 23
-	addx.l	d6,d6
-	add.l	d0,d0		; bit 23
+	add.l	d0,d0		; bit 11
 	addx.l	d5,d5
 		; D0 = free to use
 
-	move.l	a5,d2		; moved here to optimize superscalar pipeline
-		; D2 = 28, 29, 30, 31
+	move.l	(a0)+,d0	; D0 = 16, 17, 18, 19 (interleaved)
 
-	lsl.l	#7,d1		; bit 24
+	lsl.l	#7,d1		; bit 12
 	addx.l	d6,d6
-	add.l	d1,d1		; bit 24
+	add.l	d1,d1		; bit 12
 	addx.l	d5,d5
-	lsl.l	#7,d1		; bit 25
+	lsl.l	#7,d1		; bit 13
 	addx.l	d6,d6
-	add.l	d1,d1		; bit 25
+	add.l	d1,d1		; bit 13
 	addx.l	d5,d5
-	lsl.l	#7,d1		; bit 26
+	lsl.l	#7,d1		; bit 14
 	addx.l	d6,d6
-	add.l	d1,d1		; bit 26
+	add.l	d1,d1		; bit 14
 	addx.l	d5,d5
-	lsl.l	#7,d1		; bit 27
+	lsl.l	#7,d1		; bit 15
 	addx.l	d6,d6
-	add.l	d1,d1		; bit 27
+	add.l	d1,d1		; bit 15
 	addx.l	d5,d5
 		; D1 = free to use
 
-	lsl.l	#7,d2		; bit 28
+	move.l	(a0)+,d1	; D1 = 20, 21, 22, 23 (interleaved)
+
+	lsl.l	#7,d0		; bit 16
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 28
+	add.l	d0,d0		; bit 16
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 29
+	lsl.l	#7,d0		; bit 17
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 29
+	add.l	d0,d0		; bit 17
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 30
+	lsl.l	#7,d0		; bit 18
 	addx.l	d6,d6
-	add.l	d2,d2		; bit 30
+	add.l	d0,d0		; bit 18
 	addx.l	d5,d5
-	lsl.l	#7,d2		; bit 31
+	lsl.l	#7,d0		; bit 19
+	addx.l	d6,d6
+	add.l	d0,d0		; bit 19
+	addx.l	d5,d5
+		; D0 = free to use
+
+	move.l	(a0)+,d0	; D0 = 24, 25, 26, 27 (interleaved)
+
+	lsl.l	#7,d1		; bit 20
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 20
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 21
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 21
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 22
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 22
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 23
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 23
+	addx.l	d5,d5
+		; D1 = free to use
+
+	move.l	(a0)+,d1	; D1 = 28, 29, 30, 31 (interleaved)
+
+	lsl.l	#7,d0		; bit 24
+	addx.l	d6,d6
+	add.l	d0,d0		; bit 24
+	addx.l	d5,d5
+	lsl.l	#7,d0		; bit 25
+	addx.l	d6,d6
+	add.l	d0,d0		; bit 25
+	addx.l	d5,d5
+	lsl.l	#7,d0		; bit 26
+	addx.l	d6,d6
+	add.l	d0,d0		; bit 26
+	addx.l	d5,d5
+	lsl.l	#7,d0		; bit 27
+	addx.l	d6,d6
+	add.l	d0,d0		; bit 27
+	addx.l	d5,d5
+		; D0 = free to use
+
+	move.l	(a0)+,d0	; D0 = 0, 1, 2, 3 (interleaved, next round)
+
+	lsl.l	#7,d1		; bit 28
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 28
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 29
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 29
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 30
+	addx.l	d6,d6
+	add.l	d1,d1		; bit 30
+	addx.l	d5,d5
+	lsl.l	#7,d1		; bit 31
 	addx.l	d6,d6
 	; superscalar interleaving
 	move.l	d6,0(a1,a2.l)	;write bpl1
-	add.l	d2,d2		; bit 31
+	add.l	d1,d1		; bit 31
 	addx.l	d5,d5
-		; D2 = free to use
+		; D1 = free to use
 
 	move.l	d5,(a1)+		;write bpl0
 
@@ -252,7 +252,7 @@ _c2p_8x2_addx_040_core:
 ;	lea		.c2p_loop,a0
 ;	lea		.c2p_loop_end,a1
 ;	move.l	a1,d0
-;	sub.l	a0,d0	; 0x114 = 276 bytes
+;	sub.l	a0,d0	; 0x11a = 282 bytes
 ;	nop
 
 			;------;

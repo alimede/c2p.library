@@ -1,5 +1,5 @@
 
-// specify 0 to compile this example for AGA systems
+// specify 1 to compile this example for AGA systems
 #if 1
 
 #include <stdio.h>
